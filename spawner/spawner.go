@@ -8,22 +8,17 @@ import (
 
 // Spawner - struct contains common info for spawning containers
 type Spawner struct {
-	options *Options
-	api     *api.Server
-	docker  docker.Controller
+	config *Config
+	api    *api.Server
+	docker docker.Controller
 }
 
-type Options struct {
-	API    *api.Config
-	Docker *docker.Config
-}
-
-func New(options *Options) *Spawner {
+func New(config *Config) *Spawner {
 	s := &Spawner{
-		options: options,
+		config: NewConfig(config),
 	}
-	s.docker = docker.New(options.Docker)
-	s.api = api.New(options.API, s.docker)
+	s.docker = docker.New(s.config.Docker)
+	s.api = api.New(s.config.API, s.docker)
 	return s
 }
 

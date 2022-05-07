@@ -13,7 +13,9 @@ import (
 
 func TestServer_handleGetContainers(t *testing.T) {
 	d := docker.New(&docker.Config{})
-	s := New(NewConfig(), d)
+	s := New(&Config{
+		SecretKey: "123",
+	}, d)
 	rec := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/container/5", nil)
 

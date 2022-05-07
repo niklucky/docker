@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	s := spawner.New(&spawner.Options{
+	s := spawner.New(&spawner.Config{
 		Docker: &docker.Config{
-			Image:      "postgres:13",
+			Image:      "nginx",
 			AutoRemove: true,
 			// API: &api.Config{
 			// 	Address: ":8081",

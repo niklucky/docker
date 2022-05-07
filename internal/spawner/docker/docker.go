@@ -28,7 +28,7 @@ type CreateContainerOptions struct {
 
 type Controller interface {
 	CreateContainer(options CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
-	ListContainers() error
+	ListContainers() ([]types.Container, error)
 }
 
 func New(config *Config) Controller {
@@ -44,22 +44,18 @@ func (d *docker) init() {
 		log.Fatalln("Unable to create docker client")
 	}
 }
-func (d *docker) ListContainers() error {
+func (d *docker) ListContainers() ([]types.Container, error) {
 	d.init()
 
+	result := make([]types.Container, 0)
 	containers, err := d.cli.ContainerList(context.Background(), types.ContainerListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	if len(containers) > 0 {
-		for _, container := range containers {
-			fmt.Printf("Container ID: %s", container.ID)
+	for i := 0; i < len(containers); i++ {
+		var cnt = containers[i]
+		if cnt.Image == d.config.Image {
+			result = append(result, cnt)
 		}
-	} else {
-		fmt.Println("There are no containers running")
 	}
-	return nil
+	return result, err
 }
 
 func (d *docker) CreateContainer(options CreateContainerOptions) (container.ContainerCreateCreatedBody, error) {
