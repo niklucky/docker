@@ -10,11 +10,17 @@ func main() {
 	s := spawner.New(&spawner.SpawnerOptions{
 		Image:      "postgres:13",
 		AutoRemove: true,
+		// API: &api.Config{
+		// 	Address: ":8081",
+		// },
 	})
-	s.CreateContainer(spawner.CreateContainerOptions{
-		Start: true,
-		Name:  "test",
-	})
-	s.ListContainer()
+	// Starting
 	fmt.Println("Hello")
+	s.Start()
+
+	// s.CreateContainer(spawner.CreateContainerOptions{
+	// 	Start: true,
+	// 	Name:  "test",
+	// })
+	// s.ListContainer()
 }

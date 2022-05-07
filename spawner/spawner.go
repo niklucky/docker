@@ -30,6 +30,7 @@ type CreateContainerOptions struct {
 	Start      bool
 }
 type Spawner interface {
+	Start() error
 	CreateContainer(options CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
 	ListContainer() error
 }
@@ -38,18 +39,19 @@ type SpawnerOptions struct {
 	ContainerName string
 	Image         string
 	AutoRemove    bool
+	API           *api.Config
 }
 
 func New(options *SpawnerOptions) Spawner {
 	s := &spawner{
 		options: options,
 	}
-	s.api = api.New(&api.Config{})
+	s.api = api.New(options.API)
 	return s
 }
 
-func (s *spawner) Start() {
-	s.api.Start()
+func (s *spawner) Start() error {
+	return s.api.Start()
 }
 
 func (s *spawner) init() {

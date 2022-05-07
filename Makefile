@@ -1,6 +1,15 @@
-.PHONY: build
+.PHONY: build run watch reflex
+
+GO_PROJECT_NAME := docker-spawner-example
 
 build:
-	go build -o example -v ./examples/main.go
+	go build -o example examples/main.go
 
-.DEFAULT_GOAL := build
+run: build
+	./example
+
+watch:
+	ulimit -n 1000
+	reflex -s -r '\.go$$' make run
+
+.DEFAULT_GOAL := watch
