@@ -8,11 +8,8 @@ import (
 func main() {
 	s := spawner.New(&spawner.Config{
 		Docker: &docker.Config{
-			Image:      "nginx",
-			AutoRemove: true,
-			// API: &api.Config{
-			// 	Address: ":8081",
-			// },
+			Image:      "test",
+			AutoRemove: false,
 		},
 	})
 	// Starting

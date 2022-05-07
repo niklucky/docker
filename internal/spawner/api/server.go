@@ -52,11 +52,17 @@ func (s *Server) configureRouter() {
 }
 
 func (s *Server) handleGetContainers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	result, err := s.docker.ListContainers()
+	result, err := s.docker.ContainerList()
 	buildResponse(w, result, err)
 }
 func (s *Server) handleCreateContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	result, err := s.docker.ListContainers()
+	var options docker.CreateContainerOptions
+	err := json.NewDecoder(r.Body).Decode(&options)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	result, err := s.docker.ContainerCreate(&options)
 	buildResponse(w, result, err)
 }
 

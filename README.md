@@ -21,7 +21,7 @@ You can just run `make build` to build binary or `make` to run example in watch 
 
 Simple example is in `examples/main.go` with basic setup.
 In short: 
-* Init `spawner.New()` with passing basic options: `AutoDelete`, `Images` (array of docker images)
+* Init `spawner.New()` with passing basic options: `AutoDelete`, `Image` (docker image will be used to spawn)
 * Set in *Environement variables* or in `.env` file `PORT`, `AUTH_KEY` to start HTTP-server
 
 ## API
@@ -35,7 +35,6 @@ In short:
   "start": true, // optional. By default true
   "env": ["MY_ENV=Testing", "ENV_VAR2=123"],
   "image": "postgres:13", // Optional. 1st Image from setup will be used
-  "expiringAt": 123 // Will be stopped in seconds
 }
 ```
 
@@ -61,29 +60,13 @@ In short:
 
 `DELETE /containers/:id`
 
-### Getting system info
 
-`GET /system/info`
+## Tests
 
-```json
-{
-  "data": {
-    "memory": {
-      "total": 1,
-      "free": 2,
-      "used": {
-        "container_1": 1,
-        "container_2": 2
-      }
-    }
-
-  }
-}
-```
-
+Run `make test`
 ## TODO
 
 * Support for multiple nodes
-* More complex auth
+* System info 
 
 > Use at your own risk

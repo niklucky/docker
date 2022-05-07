@@ -20,15 +20,18 @@ type docker struct {
 }
 
 type CreateContainerOptions struct {
-	Name       string
-	Config     *container.Config
-	HostConfig *container.HostConfig
 	Start      bool
+	Image      string
+	Name       string
+	AutoRemove bool `json:"autoRemove"`
+	Env        []string
+	Ports      []string
 }
 
 type Controller interface {
-	CreateContainer(options CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
-	ListContainers() ([]types.Container, error)
+	ContainerList() ([]types.Container, error)
+	ContainerCreate(options *CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
+	ContainerStart(containerID string) error
 }
 
 func New(config *Config) Controller {
@@ -44,7 +47,7 @@ func (d *docker) init() {
 		log.Fatalln("Unable to create docker client")
 	}
 }
-func (d *docker) ListContainers() ([]types.Container, error) {
+func (d *docker) ContainerList() ([]types.Container, error) {
 	d.init()
 
 	result := make([]types.Container, 0)
@@ -58,12 +61,13 @@ func (d *docker) ListContainers() ([]types.Container, error) {
 	return result, err
 }
 
-func (d *docker) CreateContainer(options CreateContainerOptions) (container.ContainerCreateCreatedBody, error) {
+func (d *docker) ContainerCreate(options *CreateContainerOptions) (container.ContainerCreateCreatedBody, error) {
 	d.init()
+	fmt.Printf("%v", options)
 	cont, err := d.cli.ContainerCreate(
 		context.Background(),
-		d.parseConfig(options.Config),
-		d.parseHostConfig(options.HostConfig),
+		d.getContainerConfig(options),
+		d.getContainerHostConfig(options),
 		&network.NetworkingConfig{},
 		nil,
 		d.getContainerName(options.Name),
@@ -77,15 +81,15 @@ func (d *docker) CreateContainer(options CreateContainerOptions) (container.Cont
 	return cont, nil
 }
 
-func (d *docker) ContainerStart(containerID string) {
+func (d *docker) ContainerStart(containerID string) error {
 	d.init()
-	d.cli.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
-	fmt.Printf("Container %s is started", containerID)
+	return d.cli.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
 }
 
-func (d *docker) parseConfig(config *container.Config) *container.Config {
-	if config == nil {
-		config = &container.Config{}
+func (d *docker) getContainerConfig(options *CreateContainerOptions) *container.Config {
+	config := &container.Config{
+		Image: options.Image,
+		Env:   options.Env,
 	}
 	if config.Image == "" {
 		if d.config.Image == "" {
@@ -96,26 +100,27 @@ func (d *docker) parseConfig(config *container.Config) *container.Config {
 	return config
 }
 
-func (d *docker) parseHostConfig(hostConfig *container.HostConfig) *container.HostConfig {
-	if hostConfig == nil {
-		hostConfig = &container.HostConfig{}
+func (d *docker) getContainerHostConfig(options *CreateContainerOptions) *container.HostConfig {
+	hostConfig := &container.HostConfig{
+		AutoRemove: options.AutoRemove,
 	}
-	hostBinding := nat.PortBinding{
-		HostIP:   "0.0.0.0",
-		HostPort: "8000",
-	}
-	containerPort, err := nat.NewPort("tcp", "80")
-	if err != nil {
-		panic("Unable to get the port")
-	}
+	if len(options.Ports) > 0 {
+		hostBinding := nat.PortBinding{
+			HostIP:   "0.0.0.0",
+			HostPort: "8000",
+		}
+		containerPort, err := nat.NewPort("tcp", "80")
+		if err != nil {
+			panic("Unable to get the port")
+		}
 
-	portBinding := nat.PortMap{containerPort: []nat.PortBinding{hostBinding}}
-	hostConfig.PortBindings = portBinding
+		portBinding := nat.PortMap{containerPort: []nat.PortBinding{hostBinding}}
+		hostConfig.PortBindings = portBinding
+	}
 	if d.config.AutoRemove && !hostConfig.AutoRemove {
 		hostConfig.AutoRemove = d.config.AutoRemove
 	}
 	return hostConfig
-	// return &container.HostConfig{}
 }
 
 func (d *docker) getContainerName(name string) string {
