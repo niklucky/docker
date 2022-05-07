@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/niklucky/docker/internal/spawner/docker"
+	"github.com/niklucky/docker/pkg/spawner/docker"
 	"github.com/stretchr/testify/assert"
 )
 

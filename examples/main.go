@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/niklucky/docker/internal/spawner/docker"
+	"github.com/niklucky/docker/pkg/spawner/docker"
 	"github.com/niklucky/docker/spawner"
 )
 

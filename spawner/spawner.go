@@ -2,8 +2,8 @@
 package spawner
 
 import (
-	"github.com/niklucky/docker/internal/spawner/api"
-	"github.com/niklucky/docker/internal/spawner/docker"
+	"github.com/niklucky/docker/pkg/spawner/api"
+	"github.com/niklucky/docker/pkg/spawner/docker"
 )
 
 // Spawner - struct contains common info for spawning containers

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/niklucky/docker/internal/spawner/docker"
+	"github.com/niklucky/docker/pkg/spawner/docker"
 )
 
 type Server struct {

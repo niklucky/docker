@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/niklucky/docker/internal/spawner/api"
-	"github.com/niklucky/docker/internal/spawner/docker"
+	"github.com/niklucky/docker/pkg/spawner/api"
+	"github.com/niklucky/docker/pkg/spawner/docker"
 )
 
 const DEFAULT_SERVER_ADDRESS = ":8080"
