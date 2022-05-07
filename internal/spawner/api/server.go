@@ -6,19 +6,22 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/niklucky/docker/internal/spawner/docker"
 )
 
 type Server struct {
 	config *Config
 	router *httprouter.Router
+	docker docker.Controller
 }
 
-func New(config *Config) *Server {
+func New(config *Config, docker docker.Controller) *Server {
 	if config == nil {
 		config = &Config{}
 	}
 	return &Server{
 		config: config,
+		docker: docker,
 		router: httprouter.New(),
 	}
 }
@@ -41,5 +44,5 @@ func (s *Server) configureRouter() {
 }
 
 func (s *Server) handleGetContainers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("id"))
+	fmt.Fprintf(w, "hello, %s!", ps.ByName("id"))
 }

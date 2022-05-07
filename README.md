@@ -12,6 +12,11 @@ In order not to open the Docker control to the outside and severely limit the po
 * You can get remote info about machine to consider balance loading
 * System prune 
 
+## Example
+
+In folder `examples`
+
+You can just run `make build` to build binary or `make` to run example in watch mode (reflex).
 ## Setup
 
 Simple example is in `examples/main.go` with basic setup.
