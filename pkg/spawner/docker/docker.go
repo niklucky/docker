@@ -32,6 +32,7 @@ type Controller interface {
 	ContainerList() ([]types.Container, error)
 	ContainerCreate(options *CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
 	ContainerStart(containerID string) error
+	ContainerRemove(containerID string, options types.ContainerRemoveOptions) error
 }
 
 func New(config *Config) Controller {
@@ -42,7 +43,7 @@ func New(config *Config) Controller {
 
 func (d *docker) init() {
 	var err error
-	d.cli, err = client.NewEnvClient()
+	d.cli, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		log.Fatalln("Unable to create docker client")
 	}
@@ -86,6 +87,22 @@ func (d *docker) ContainerStart(containerID string) error {
 	return d.cli.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
 }
 
+func (d *docker) ContainerStop(containerID string) error {
+	d.init()
+	return d.cli.ContainerStop(context.Background(), containerID, nil)
+}
+
+func (d *docker) ContainerRemove(containerID string, options types.ContainerRemoveOptions) error {
+	d.init()
+	return d.cli.ContainerRemove(context.Background(), containerID, options)
+}
+func (d *docker) ContainerInspect(containerID string) error {
+	d.init()
+	data, err := d.cli.ContainerInspect(context.Background(), containerID)
+	fmt.Println(data)
+	return err
+}
+
 func (d *docker) getContainerConfig(options *CreateContainerOptions) *container.Config {
 	config := &container.Config{
 		Image: options.Image,
@@ -100,6 +117,7 @@ func (d *docker) getContainerConfig(options *CreateContainerOptions) *container.
 	return config
 }
 
+// FIXME: This code is not implemented
 func (d *docker) getContainerHostConfig(options *CreateContainerOptions) *container.HostConfig {
 	hostConfig := &container.HostConfig{
 		AutoRemove: options.AutoRemove,
