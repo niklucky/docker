@@ -32,6 +32,7 @@ type Controller interface {
 	ContainerList() ([]types.Container, error)
 	ContainerCreate(options *CreateContainerOptions) (container.ContainerCreateCreatedBody, error)
 	ContainerStart(containerID string) error
+	ContainerStop(containerID string) error
 	ContainerRemove(containerID string, options types.ContainerRemoveOptions) error
 }
 

@@ -48,7 +48,7 @@ func (s *Server) configureRouter() {
 	s.router.GET("/containers/:id", s.auth.ByToken(s.handleGetContainers))
 	s.router.POST("/containers", s.auth.ByToken(s.handleCreateContainer))
 	s.router.PUT("/containers/:id", s.auth.ByToken(s.handleGetContainers))
-	s.router.PUT("/containers/:id/stop", s.auth.ByToken(s.handleGetContainers))
+	s.router.PUT("/containers/:id/stop", s.auth.ByToken(s.handleStopContainer))
 	s.router.DELETE("/containers/:id", s.auth.ByToken(s.handleRemoveContainer))
 	s.router.GET("/system/info", s.auth.ByToken(s.handleGetContainers))
 }
@@ -58,7 +58,6 @@ func (s *Server) handleGetContainers(w http.ResponseWriter, r *http.Request, ps 
 	buildResponse(w, result, err)
 }
 func (s *Server) handleRemoveContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
 	var options types.ContainerRemoveOptions
 	err := json.NewDecoder(r.Body).Decode(&options)
 	if err != nil {
@@ -66,6 +65,10 @@ func (s *Server) handleRemoveContainer(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 	err = s.docker.ContainerRemove(ps.ByName("id"), options)
+	buildResponse(w, nil, err)
+}
+func (s *Server) handleStopContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	err := s.docker.ContainerStop(ps.ByName("id"))
 	buildResponse(w, nil, err)
 }
 func (s *Server) handleCreateContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
