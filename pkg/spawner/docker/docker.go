@@ -123,17 +123,23 @@ func (d *docker) getContainerHostConfig(options *CreateContainerOptions) *contai
 	hostConfig := &container.HostConfig{
 		AutoRemove: options.AutoRemove,
 	}
-	if len(options.Ports) > 0 {
-		hostBinding := nat.PortBinding{
-			HostIP:   "0.0.0.0",
-			HostPort: "8000",
-		}
-		containerPort, err := nat.NewPort("tcp", "80")
-		if err != nil {
-			panic("Unable to get the port")
-		}
 
-		portBinding := nat.PortMap{containerPort: []nat.PortBinding{hostBinding}}
+	if len(options.Ports) > 0 {
+		portBinding := make(nat.PortMap)
+
+		for _, port := range options.Ports {
+			hostBinding := nat.PortBinding{
+				HostIP:   "0.0.0.0",
+				HostPort: port,
+			}
+			containerPort, err := nat.NewPort("tcp", port)
+			if err != nil {
+				panic("Unable to get the port")
+			}
+
+			// portBinding := nat.PortMap{containerPort: []nat.PortBinding{hostBinding}}
+			portBinding[containerPort] = []nat.PortBinding{hostBinding}
+		}
 		hostConfig.PortBindings = portBinding
 	}
 	if d.config.AutoRemove && !hostConfig.AutoRemove {
