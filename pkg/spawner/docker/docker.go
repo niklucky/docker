@@ -115,6 +115,18 @@ func (d *docker) getContainerConfig(options *CreateContainerOptions) *container.
 		}
 		config.Image = d.config.Image
 	}
+	if len(options.Ports) > 0 {
+		exposedPorts := make(map[nat.Port]struct{})
+
+		for _, port := range options.Ports {
+			containerPort, err := nat.NewPort("tcp", port)
+			if err != nil {
+				panic("Unable to get the port")
+			}
+			exposedPorts[containerPort] = struct{}{}
+		}
+		config.ExposedPorts = exposedPorts
+	}
 	return config
 }
 

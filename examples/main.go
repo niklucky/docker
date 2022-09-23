@@ -8,7 +8,7 @@ import (
 func main() {
 	s := spawner.New(&spawner.Config{
 		Docker: &docker.Config{
-			Image:      "test",
+			Image:      "mossport_server",
 			AutoRemove: false,
 		},
 	})
